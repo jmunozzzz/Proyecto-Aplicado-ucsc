@@ -26,6 +26,17 @@
 
         {{-- ── CTA + Mobile Toggle ── --}}
         <div class="flex items-center gap-3">
+            <a href="{{ auth()->check() ? route('dashboard') : route('login') }}"
+               id="nav-login-btn"
+               class="hidden sm:inline-flex items-center gap-2 text-slate-200 hover:text-white text-sm font-semibold font-jakarta
+                      px-4 py-2.5 rounded-lg border border-slate-600/70 hover:border-nm-cyan hover:bg-nm-cyan/10
+                      transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">
+                <svg class="w-4 h-4 text-nm-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                </svg>
+                @auth Panel @else Iniciar sesión @endauth
+            </a>
+
             <a href="#contacto"
                class="hidden sm:inline-flex items-center gap-2 bg-nm-cyan hover:bg-cyan-400 text-white text-sm font-semibold font-jakarta
                       px-5 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:-translate-y-0.5">
@@ -55,6 +66,10 @@
             <a href="#testimonios" class="px-6 py-4 text-slate-300 hover:text-nm-cyan hover:bg-slate-800/60 text-sm font-medium transition-colors">Casos de Éxito</a>
             <a href="#resultados"  class="px-6 py-4 text-slate-300 hover:text-nm-cyan hover:bg-slate-800/60 text-sm font-medium transition-colors">Resultados</a>
             <a href="#contacto"    class="px-6 py-4 text-slate-300 hover:text-nm-cyan hover:bg-slate-800/60 text-sm font-medium transition-colors">Contacto</a>
+            <a href="{{ auth()->check() ? route('dashboard') : route('login') }}" id="mobile-login-btn"
+               class="px-6 py-4 text-slate-300 hover:text-nm-cyan hover:bg-slate-800/60 text-sm font-medium transition-colors">
+                @auth Ir al panel @else Iniciar sesión (equipo interno) @endauth
+            </a>
             <div class="p-4">
                 <a href="#contacto"
                    class="block text-center bg-nm-cyan hover:bg-cyan-400 text-white text-sm font-semibold font-jakarta px-5 py-3 rounded-xl transition-all">

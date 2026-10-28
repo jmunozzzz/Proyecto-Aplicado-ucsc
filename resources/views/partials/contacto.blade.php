@@ -1,8 +1,4 @@
-{{-- ═══════════════════════════════════════════════
-    PARTIAL: contacto.blade.php
-    Formulario de Contacto / Conversión
-    Fondo: #f8fafc (claro, limpio, profesional)
-══════════════════════════════════════════════ --}}
+
 
 <section id="contacto" class="bg-slate-50 py-24 lg:py-32 relative overflow-hidden">
 

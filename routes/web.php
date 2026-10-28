@@ -3,6 +3,20 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\AuthController;
+
+/*
+|--------------------------------------------------------------------------
+| Acceso al sistema administrativo (sin registro público)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+    Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1')
+        ->name('login.attempt');
+});
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,10 +57,18 @@ Route::post('/contacto', function (Request $request) {
 
 /*
 |--------------------------------------------------------------------------
-| Módulo: Personas / Alumnos
+| Área Administrativa (Requiere autenticación)
 |--------------------------------------------------------------------------
 */
-Route::prefix('personas')->name('personas.')->group(function () {
-    Route::get('/',        [PersonaController::class, 'index'])->name('index');
-    Route::get('/{persona}', [PersonaController::class, 'show'])->name('show');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+
+    // Módulo: Personas / Alumnos
+    Route::prefix('personas')->name('personas.')->group(function () {
+        Route::get('/',          [PersonaController::class, 'index'])->name('index');
+        Route::get('/{persona}', [PersonaController::class, 'show'])->name('show');
+    });
 });
+

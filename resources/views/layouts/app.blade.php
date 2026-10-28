@@ -72,14 +72,10 @@
 
         /* ── Background patterns ── */
         .bg-grid-dark {
-            background-color: #0f172a;
-            background-image: linear-gradient(rgba(6,182,212,.06) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(6,182,212,.06) 1px, transparent 1px);
-            background-size: 60px 60px;
+            background-color: #0a1120;
         }
         .bg-dots {
-            background-image: radial-gradient(rgba(6,182,212,.18) 1px, transparent 1px);
-            background-size: 22px 22px;
+            display: none;
         }
 
         /* ── Navbar ── */

@@ -1,25 +1,11 @@
 
 
-<section id="hero" class="relative min-h-screen bg-grid-dark flex flex-col justify-center overflow-hidden">
+<section id="hero" class="relative min-h-screen bg-[#0a1120] flex flex-col justify-center overflow-hidden">
 
     {{-- ── Decorative blobs ── --}}
     <div class="absolute top-1/4 -left-40 w-96 h-96 bg-nm-cyan/10 rounded-full blur-3xl blob pointer-events-none"></div>
     <div class="absolute bottom-1/4 -right-40 w-80 h-80 bg-nm-cyan2/10 rounded-full blur-3xl blob pointer-events-none" style="animation-delay: -3s;"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-nm-cyan/5 rounded-full blur-[100px] pointer-events-none"></div>
-
-    {{-- ── Dot pattern overlay ── --}}
-    <div class="absolute inset-0 bg-dots opacity-40 pointer-events-none"></div>
-
-    {{-- ── Top-right decorative lines ── --}}
-    <div class="absolute top-20 right-10 opacity-20 pointer-events-none hidden lg:block">
-        <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
-            <circle cx="100" cy="100" r="80" stroke="#06b6d4" stroke-width="1" stroke-dasharray="8 4"/>
-            <circle cx="100" cy="100" r="55" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4 6"/>
-            <circle cx="100" cy="100" r="30" stroke="#06b6d4" stroke-width="1"/>
-            <line x1="20" y1="100" x2="180" y2="100" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4 4"/>
-            <line x1="100" y1="20" x2="100" y2="180" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4 4"/>
-        </svg>
-    </div>
 
     <div class="relative max-w-7xl mx-auto px-5 lg:px-10 pt-32 pb-20 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full">
 
