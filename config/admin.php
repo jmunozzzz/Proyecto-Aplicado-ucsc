@@ -10,8 +10,8 @@
 |              (incluye páginas de detalle/edición, p. ej. 'personas.*').
 | - 'icon'   : nombre de icono del componente <x-icon> (Heroicons outline).
 |
-| Aún no hay permisos implementados para el panel: cuando existan, agregar
-| una clave 'can' por ítem y filtrarla en App\Support\AdminNavigation.
+| - 'can'    : (opcional) gate requerido para mostrar el ítem. Solo afecta lo
+|              visible: el control real se aplica en las rutas (routes/web.php).
 */
 
 return [
@@ -28,10 +28,12 @@ return [
             'title' => 'Gestión académica',
             'items' => [
                 ['label' => 'Personas / Alumnos', 'icon' => 'users', 'route' => 'personas.index', 'active' => 'personas.*',
-                 'description' => 'Directorio de contactos, leads y participantes.'],
+                 'description' => 'Directorio de contactos, leads y participantes.',
+                 'can' => 'view-personas'],
                 ['label' => 'Empresas',           'icon' => 'building-office', 'route' => null],
                 ['label' => 'Programas / Cursos', 'icon' => 'academic-cap',    'route' => 'programas.index', 'active' => 'programas.*',
-                 'description' => 'Catálogo de cursos sincronizados desde Systeme.io y ficha académica local.'],
+                 'description' => 'Catálogo de cursos sincronizados desde Systeme.io y ficha académica local.',
+                 'can' => 'view-programas'],
                 ['label' => 'Cohortes',           'icon' => 'user-group',      'route' => null],
                 ['label' => 'Inscripciones',      'icon' => 'clipboard-list',  'route' => 'inscripciones.index', 'active' => 'inscripciones.*',
                  'description' => 'Bandeja de inscripciones sincronizadas desde Systeme.io y estado de vinculación local.',

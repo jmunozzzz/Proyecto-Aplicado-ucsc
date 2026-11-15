@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,15 @@ class AuthController extends Controller
             'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        // Una cuenta inactiva recibe el mismo mensaje genérico que unas credenciales
+        // incorrectas, para no revelar que la cuenta existe.
+        $autenticado = Auth::attemptWhen(
+            $credentials,
+            fn (User $user) => $user->estaActivo(),
+            $request->boolean('remember')
+        );
+
+        if (! $autenticado) {
             throw ValidationException::withMessages([
                 'email' => 'Las credenciales ingresadas no son correctas.',
             ]);

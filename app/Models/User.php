@@ -162,6 +162,24 @@ class User extends Authenticatable
         return $usuario->tieneRol($rol);
     }
 
+    /**
+     * Comprueba si el usuario posee al menos uno de los roles indicados.
+     * Delega en tieneRol() para aplicar las mismas reglas (cuenta activa,
+     * usuario de dominio activo y rol global sin empresa asociada).
+     *
+     * @param  list<string>  $roles
+     */
+    public function tieneAlgunRol(array $roles): bool
+    {
+        foreach ($roles as $rol) {
+            if ($this->tieneRol($rol)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function esAdministradorActivo(): bool
     {
         return $this->tieneRol(UsuarioRol::ROL_ADMINISTRADOR);

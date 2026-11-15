@@ -68,18 +68,25 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
 
     // Módulo: Personas / Alumnos
-    Route::prefix('personas')->name('personas.')->group(function () {
+    Route::prefix('personas')
+        ->name('personas.')
+        ->middleware('can:view-personas')
+        ->group(function () {
         Route::get('/',          [PersonaController::class, 'index'])->name('index');
         Route::get('/{persona}', [PersonaController::class, 'show'])->name('show');
     });
 
     // Módulo: Programas / Cursos
     Route::prefix('programas')->name('programas.')->group(function () {
-        Route::get('/',           [ProgramaController::class, 'index'])->name('index');
+        Route::get('/',           [ProgramaController::class, 'index'])
+            ->middleware('can:view-programas')
+            ->name('index');
         Route::post('/sincronizar', [ProgramaController::class, 'sync'])
             ->middleware('can:manage-programas')
             ->name('sync');
-        Route::get('/{programa}', [ProgramaController::class, 'show'])->name('show');
+        Route::get('/{programa}', [ProgramaController::class, 'show'])
+            ->middleware('can:view-programas')
+            ->name('show');
         Route::patch('/{programa}', [ProgramaController::class, 'update'])
             ->middleware('can:manage-programas')
             ->name('update');
