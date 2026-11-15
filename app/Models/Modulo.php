@@ -18,6 +18,11 @@ class Modulo extends Model
         'id_systeme_modulo',
     ];
 
+    protected $casts = [
+        'orden'            => 'integer',
+        'systeme_presente' => 'boolean',
+    ];
+
     // Relaciones
     public function programa(): BelongsTo
     {
@@ -26,6 +31,6 @@ class Modulo extends Model
 
     public function lecciones(): HasMany
     {
-        return $this->hasMany(Leccion::class, 'modulo_id');
+        return $this->hasMany(Leccion::class, 'modulo_id')->orderBy('orden');
     }
 }

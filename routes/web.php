@@ -2,7 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\ProgramaController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -70,5 +72,154 @@ Route::middleware('auth')->group(function () {
         Route::get('/',          [PersonaController::class, 'index'])->name('index');
         Route::get('/{persona}', [PersonaController::class, 'show'])->name('show');
     });
+
+    // Módulo: Programas / Cursos
+    Route::prefix('programas')->name('programas.')->group(function () {
+        Route::get('/',           [ProgramaController::class, 'index'])->name('index');
+        Route::post('/sincronizar', [ProgramaController::class, 'sync'])
+            ->middleware('can:manage-programas')
+            ->name('sync');
+        Route::get('/{programa}', [ProgramaController::class, 'show'])->name('show');
+        Route::patch('/{programa}', [ProgramaController::class, 'update'])
+            ->middleware('can:manage-programas')
+            ->name('update');
+    });
+
+    // Módulo: Inscripciones (Bandeja de inscripciones de Systeme.io)
+    Route::prefix('inscripciones')
+        ->name('inscripciones.')
+        ->middleware('can:manage-inscripciones')
+        ->group(function () {
+            Route::get('/', [InscripcionController::class, 'index'])->name('index');
+            Route::post('/sincronizar', [InscripcionController::class, 'sync'])->name('sync');
+            Route::post('/importar-alumnos', [InscripcionController::class, 'importAlumnos'])->name('import-alumnos');
+        });
 });
 
+// Prueba de conexión con ngrok
+Route::get('/prueba-systeme', function () {
+    return response()->json([
+        'ok' => true,
+        'mensaje' => 'Ngrok conectado con Laravel',
+    ]);
+});
+
+// Recibe inscripciones y crea o actualiza la persona.
+Route::post('/webhooks/systeme', function (Request $request) {
+    // Verificar la clave antes de procesar datos.
+    $claveEsperada = (string) config('services.systeme.webhook_token');
+    $claveRecibida = (string) $request->query('token', '');
+
+    abort_unless(
+        $claveEsperada !== ''
+            && hash_equals($claveEsperada, $claveRecibida),
+        403,
+        'Webhook no autorizado.'
+    );
+
+    // Ignorar otros eventos o cursos.
+    if (
+        $request->input('type') !== 'contact.course.enrolled'
+        || (string) $request->input('data.course.id') !== '674252'
+    ) {
+        return response()->json(['ignorado' => true]);
+    }
+
+    $datos = $request->validate([
+        'data.contact.id' => ['required', 'integer', 'min:1'],
+        'data.contact.email' => ['required', 'email', 'max:255'],
+        'data.contact.fields.first_name' => [
+            'required', 'string', 'max:255',
+        ],
+        'data.contact.fields.surname' => [
+            'required', 'string', 'max:255',
+        ],
+    ]);
+
+    $contacto = $datos['data']['contact'];
+    $contactoId = (string) $contacto['id'];
+    $email = strtolower(trim($contacto['email']));
+    $nombres = trim($contacto['fields']['first_name']);
+    $apellidos = trim($contacto['fields']['surname']);
+
+    abort_if(
+        $nombres === '' || $apellidos === '',
+        422,
+        'El nombre y el apellido son obligatorios.'
+    );
+
+    $persona = \Illuminate\Support\Facades\DB::transaction(
+        function () use ($contactoId, $email, $nombres, $apellidos) {
+            $persona = \App\Models\Persona::where(
+                'id_systeme_contacto',
+                $contactoId
+            )->lockForUpdate()->first();
+
+            // Si no está vinculada, buscar coincidencias por correo.
+            if (!$persona) {
+                $coincidencias = \App\Models\Persona::whereRaw(
+                    'LOWER(TRIM(email)) = ?',
+                    [$email]
+                )->lockForUpdate()->limit(2)->get();
+
+                abort_if(
+                    $coincidencias->count() > 1,
+                    409,
+                    'Hay varias personas con ese correo; revisar vinculación.'
+                );
+
+                $persona = $coincidencias->first();
+
+                abort_if(
+                    $persona
+                        && $persona->id_systeme_contacto !== null
+                        && (string) $persona->id_systeme_contacto !== $contactoId,
+                    409,
+                    'El correo ya está vinculado a otro contacto de Systeme.io.'
+                );
+            }
+
+            if (!$persona) {
+                // La clave única del contacto evita duplicar su ID.
+                $persona = \App\Models\Persona::createOrFirst(
+                    ['id_systeme_contacto' => $contactoId],
+                    [
+                        'nombres' => $nombres,
+                        'apellidos' => $apellidos,
+                        'email' => $email,
+                        'origen_lead' => 'systeme.io',
+                        'estado' => 'alumno_activo',
+                    ]
+                );
+            } else {
+                $persona->id_systeme_contacto = $contactoId;
+                $persona->nombres = $nombres;
+                $persona->apellidos = $apellidos;
+                $persona->email = $email;
+
+                if ($persona->estado === 'lead') {
+                    $persona->estado = 'alumno_activo';
+                }
+
+                $persona->save();
+            }
+
+            return $persona;
+        }
+    );
+
+    \Illuminate\Support\Facades\Log::info(
+        'Persona sincronizada desde Systeme.io',
+        [
+            'persona_id' => $persona->id,
+            'contacto_id' => $contactoId,
+        ]
+    );
+
+    return response()->json([
+        'recibido' => true,
+        'persona_id' => $persona->id,
+    ]);
+})->withoutMiddleware([
+    \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+]);

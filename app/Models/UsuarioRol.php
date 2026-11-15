@@ -10,6 +10,11 @@ class UsuarioRol extends Model
     protected $table = 'usuario_rol';
     public $timestamps = false;
 
+    public const ROL_ADMINISTRADOR = 'administrador_nm';
+    public const ROL_RRHH          = 'rrhh';
+    public const ROL_FACILITADOR   = 'facilitador';
+    public const ROL_ALUMNO        = 'alumno';
+
     protected $fillable = [
         'usuario_id',
         'rol',

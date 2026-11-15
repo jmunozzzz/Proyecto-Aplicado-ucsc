@@ -15,11 +15,23 @@ class AdminNavigation
      */
     public static function sections(): array
     {
+        $user = auth()->user();
+
         return collect(config('admin.navigation', []))
-            ->map(fn (array $section) => [
-                'title' => $section['title'],
-                'items' => array_map(fn (array $item) => self::resolve($item), $section['items']),
-            ])
+            ->map(function (array $section) use ($user) {
+                $items = collect($section['items'])
+                    ->filter(fn (array $item) => ! isset($item['can']) || ($user !== null && $user->can($item['can'])))
+                    ->map(fn (array $item) => self::resolve($item))
+                    ->values()
+                    ->all();
+
+                return [
+                    'title' => $section['title'],
+                    'items' => $items,
+                ];
+            })
+            ->filter(fn (array $section) => ! empty($section['items']))
+            ->values()
             ->all();
     }
 

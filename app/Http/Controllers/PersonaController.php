@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class PersonaController extends Controller
 {
@@ -59,7 +60,7 @@ class PersonaController extends Controller
         // Totales rápidos para los badges del header
         $totales = [
             'total'    => Persona::count(),
-            'activos'  => Persona::where('estado', 'activo')->count(),
+            'activos'  => Persona::where('estado', 'alumno_activo')->count(),
             'leads'    => Persona::where('estado', 'lead')->count(),
             'inactivos'=> Persona::where('estado', 'inactivo')->count(),
         ];
@@ -74,12 +75,18 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
-        $persona->load([
+        $relations = [
             'inscripciones.cohorte.programa',
             'inscripciones.asistencia',
             'historialLaboral.empresa',
             'usuario.roles',
-        ]);
+        ];
+
+        if (Schema::hasTable('inscripcion_systeme')) {
+            $relations['inscripcionesSysteme'] = fn ($q) => $q->with('programa')->orderByDesc('id_systeme_inscripcion');
+        }
+
+        $persona->load($relations);
 
         return view('personas.show', compact('persona'));
     }

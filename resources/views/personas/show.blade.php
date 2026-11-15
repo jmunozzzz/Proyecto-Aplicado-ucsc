@@ -194,6 +194,10 @@
                     <span class="info-value">{{ $persona->origen_lead ?? '—' }}</span>
                 </div>
                 <div class="info-row">
+                    <span class="info-label">ID Systeme.io</span>
+                    <span class="info-value">{{ $persona->id_systeme_contacto ? '#' . $persona->id_systeme_contacto : '—' }}</span>
+                </div>
+                <div class="info-row">
                     <span class="info-label">Fecha registro</span>
                     <span class="info-value">
                         {{ $persona->creado_en ? \Carbon\Carbon::parse($persona->creado_en)->format('d/m/Y H:i') : '—' }}
@@ -254,7 +258,89 @@
         </div>
     </div>
 
-    {{-- ── Inscripciones ── --}}
+    {{-- ── Inscripciones vinculadas desde Systeme.io ── --}}
+    @php
+        $inscripcionesSysteme = $persona->relationLoaded('inscripcionesSysteme')
+            ? $persona->inscripcionesSysteme
+            : collect();
+    @endphp
+    <div class="panel overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+            <h3 class="section-title mb-0 flex items-center gap-2">
+                <x-icon name="clipboard-list" class="w-4 h-4 text-nm-cyan" />
+                Inscripciones vinculadas (Systeme.io)
+                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full
+                             text-xs font-semibold bg-nm-cyan/10 text-nm-cyan border border-nm-cyan/25 normal-case tracking-normal">
+                    {{ $inscripcionesSysteme->count() }}
+                </span>
+            </h3>
+        </div>
+
+        @if($inscripcionesSysteme->isEmpty())
+            <div class="py-12 text-center text-slate-400 text-sm">
+                <x-icon name="clipboard-list" class="w-8 h-8 mx-auto text-slate-600 mb-2" />
+                Sin inscripciones de Systeme.io vinculadas a esta persona.
+            </div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="ins-table" aria-label="Inscripciones de Systeme.io vinculadas a la persona">
+                    <thead>
+                        <tr>
+                            <th scope="col">Curso / Programa</th>
+                            <th scope="col">ID Inscripción</th>
+                            <th scope="col">Estado de acceso</th>
+                            <th scope="col">Tipo de acceso</th>
+                            <th scope="col" class="hidden md:table-cell">Vía de vinculación</th>
+                            <th scope="col" class="hidden lg:table-cell">Última sincronización</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($inscripcionesSysteme as $insSys)
+                            <tr>
+                                <td>
+                                    @if($insSys->programa)
+                                        <a href="{{ route('programas.show', $insSys->programa) }}"
+                                           class="font-semibold text-nm-cyan hover:text-cyan-300 transition-colors text-sm">
+                                            {{ $insSys->programa->nombre }}
+                                        </a>
+                                    @else
+                                        <p class="font-semibold text-white text-sm">
+                                            {{ $insSys->curso_nombre_systeme ?? 'Curso #' . $insSys->id_systeme_curso }}
+                                        </p>
+                                    @endif
+                                    <p class="text-xs text-slate-400 mt-0.5">
+                                        Curso Systeme #{{ $insSys->id_systeme_curso }} · {{ $insSys->email_contacto }}
+                                    </p>
+                                </td>
+                                <td class="text-slate-300 font-medium">
+                                    #{{ $insSys->id_systeme_inscripcion }}
+                                </td>
+                                <td>
+                                    @if($insSys->systeme_activo)
+                                        <span class="badge badge-activo">Acceso activo</span>
+                                    @else
+                                        <span class="badge badge-inactivo">Acceso inactivo</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="text-slate-200 font-medium text-sm">{{ $insSys->accessTypeLabel() }}</span>
+                                    <span class="block text-xs text-slate-500">{{ $insSys->access_type }}</span>
+                                </td>
+                                <td class="hidden md:table-cell">
+                                    <span class="badge badge-default">{{ $insSys->vinculacionViaLabel() ?? 'Vinculada' }}</span>
+                                </td>
+                                <td class="hidden lg:table-cell text-slate-400 text-xs">
+                                    {{ $insSys->sincronizado_en ? $insSys->sincronizado_en->format('d/m/Y H:i') : '—' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+
+    {{-- ── Inscripciones académicas (Cohortes) ── --}}
     <div class="panel overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
             <h3 class="section-title mb-0 flex items-center gap-2">

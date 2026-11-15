@@ -11,6 +11,8 @@ class Usuario extends Model
     protected $table = 'usuario';
     public $timestamps = false;
 
+    public const PROVEEDOR_LOCAL = 'local';
+
     protected $fillable = [
         'persona_id',
         'proveedor_auth',
@@ -31,5 +33,23 @@ class Usuario extends Model
     public function roles(): HasMany
     {
         return $this->hasMany(UsuarioRol::class, 'usuario_id');
+    }
+
+    public function tieneRol(string $rol): bool
+    {
+        if (! $this->activo) {
+            return false;
+        }
+
+        if ($this->relationLoaded('roles')) {
+            return $this->roles->contains(
+                fn (UsuarioRol $r) => $r->rol === $rol && $r->empresa_id === null
+            );
+        }
+
+        return $this->roles()
+            ->where('rol', $rol)
+            ->whereNull('empresa_id')
+            ->exists();
     }
 }

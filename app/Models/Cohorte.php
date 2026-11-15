@@ -14,26 +14,42 @@ class Cohorte extends Model
 
     protected $fillable = [
         'programa_id',
+        'empresa_id',
+        'nombre',
         'codigo',
         'facilitador_id',
         'fecha_inicio',
         'fecha_fin',
         'modalidad',
+        'sede_o_enlace',
         'plataforma',
+        'cupos',
         'cupo_max',
         'estado',
+        'contenidos_a_medida',
+        'codigo_sence',
+        'folio_accion_sence',
+        'asistencia_minima_pct',
+        'criterio_asistencia',
         'id_systeme_cohorte',
     ];
 
     protected $casts = [
-        'fecha_inicio' => 'date',
-        'fecha_fin'    => 'date',
+        'fecha_inicio'          => 'date',
+        'fecha_fin'             => 'date',
+        'contenidos_a_medida'   => 'boolean',
+        'asistencia_minima_pct' => 'decimal:2',
     ];
 
     // Relaciones
     public function programa(): BelongsTo
     {
         return $this->belongsTo(Programa::class, 'programa_id');
+    }
+
+    public function empresa(): BelongsTo
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id');
     }
 
     public function facilitador(): BelongsTo

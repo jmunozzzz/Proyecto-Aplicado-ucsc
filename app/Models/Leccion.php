@@ -20,6 +20,14 @@ class Leccion extends Model
         'id_systeme_leccion',
     ];
 
+    protected $casts = [
+        'orden'            => 'integer',
+        // Estado de publicación de la lección en Systeme.io. No representa progreso,
+        // pago ni acceso de ningún alumno.
+        'systeme_activo'   => 'boolean',
+        'systeme_presente' => 'boolean',
+    ];
+
     // Relaciones
     public function modulo(): BelongsTo
     {

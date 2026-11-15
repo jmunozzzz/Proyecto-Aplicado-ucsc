@@ -60,6 +60,11 @@ class Persona extends Model
         return $this->hasMany(Inscripcion::class, 'persona_id');
     }
 
+    public function inscripcionesSysteme(): HasMany
+    {
+        return $this->hasMany(InscripcionSysteme::class, 'persona_id');
+    }
+
     public function interaccionesMarketing(): HasMany
     {
         return $this->hasMany(InteraccionMarketing::class, 'persona_id');
