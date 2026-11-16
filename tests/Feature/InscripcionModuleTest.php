@@ -595,35 +595,38 @@ class InscripcionModuleTest extends TestCase
 
         $this->assertSame(9, InscripcionSysteme::count());
 
-        // Listado completo
-        $this->actingAs($admin)
+        // Las filas de la bandeja se identifican por el correo del contacto:
+        // #24803863 → alumno1@ejemplo.cl (vinculada), #24609113 → alumno2@ejemplo.cl, #24540790 → alumno9@ejemplo.cl
+
+        // Listado completo: la inscripción #24803863 aparece con su estado «Vinculada» en la misma fila
+        $listado = $this->actingAs($admin)
             ->get('/inscripciones')
             ->assertOk()
             ->assertSee('Bandeja de')
-            ->assertSee('24803863')
-            ->assertSee('Alumno Registrado')
+            ->assertSee('alumno1@ejemplo.cl')
             ->assertSee('Acceso parcial por goteo');
+        $this->assertFilaVinculada($listado->getContent(), 'alumno1@ejemplo.cl');
 
         // Filtro por estado de vinculación = vinculada (solo #24803863)
         $this->actingAs($admin)
             ->get('/inscripciones?vinculacion=vinculada')
             ->assertOk()
-            ->assertSee('24803863')
-            ->assertDontSee('24609113');
+            ->assertSee('alumno1@ejemplo.cl')
+            ->assertDontSee('alumno2@ejemplo.cl');
 
         // Filtro por estado de vinculación = pendiente (las otras 8)
         $this->actingAs($admin)
             ->get('/inscripciones?vinculacion=pendiente')
             ->assertOk()
-            ->assertSee('24609113')
-            ->assertDontSee('24803863');
+            ->assertSee('alumno2@ejemplo.cl')
+            ->assertDontSee('alumno1@ejemplo.cl');
 
         // Filtro por curso = 674252 y acceso = activo
         $this->actingAs($admin)
             ->get('/inscripciones?curso=674252&acceso=activo')
             ->assertOk()
-            ->assertSee('24803863')
-            ->assertSee('24540790');
+            ->assertSee('alumno1@ejemplo.cl')
+            ->assertSee('alumno9@ejemplo.cl');
 
         // Ficha de la persona (#2): muestra su inscripción vinculada de Systeme.io
         $this->actingAs($admin)
@@ -1076,7 +1079,171 @@ class InscripcionModuleTest extends TestCase
             ->assertSee('Importación de alumnos pendientes completada')
             ->assertSee('Personas creadas')
             ->assertSee('Vinculaciones existentes')
-            ->assertSee('María González');
+            ->assertSee('alumno9@ejemplo.cl');
+
+        // La fila de la inscripción importada (alumno9@ejemplo.cl, persona María González) queda «Vinculada»
+        $this->assertFilaVinculada($response->getContent(), 'alumno9@ejemplo.cl');
+    }
+
+    /**
+     * Comprueba que la fila de la bandeja identificada por el correo del contacto
+     * muestre el estado «Vinculada» en esa misma fila.
+     */
+    private function assertFilaVinculada(string $html, string $email): void
+    {
+        $this->assertEstadoVinculacionFila($html, $email, 'Vinculada');
+    }
+
+    /**
+     * Comprueba que la fila de la bandeja identificada por el correo muestre solo la etiqueta
+     * de vinculación indicada, sin las otras dos, y devuelve el HTML de esa fila.
+     */
+    private function assertEstadoVinculacionFila(string $html, string $email, string $etiqueta): string
+    {
+        preg_match_all('#<tr\b.*?</tr>#s', $html, $filas);
+        $fila = collect($filas[0])->first(fn (string $tr) => str_contains($tr, e($email)));
+
+        $this->assertNotNull($fila, "No se encontró la fila de la bandeja con el correo {$email}.");
+
+        foreach (['Vinculada', 'Vinculación pendiente', 'Conflicto de vinculación'] as $posible) {
+            $posible === $etiqueta
+                ? $this->assertStringContainsString($posible, $fila)
+                : $this->assertStringNotContainsString($posible, $fila);
+        }
+
+        return $fila;
+    }
+
+    public function test_importar_alumnos_usa_el_curso_del_filtro_o_el_predeterminado_con_todos_los_cursos(): void
+    {
+        [$evolucion, $claridad] = $this->sembrarDatosBasePrueba();
+        $ahora = Carbon::now();
+
+        // Una inscripción pendiente (sin persona) en cada curso
+        foreach ([[$evolucion, '674252', '40000001', 'pendiente-ec@ejemplo.cl'], [$claridad, '674153', '40000002', 'pendiente-ce@ejemplo.cl']] as [$prog, $curso, $id, $email]) {
+            InscripcionSysteme::create([
+                'id_systeme_inscripcion'    => $id,
+                'id_systeme_curso'          => $curso,
+                'id_systeme_contacto'       => '6' . $id,
+                'email_contacto'            => $email,
+                'access_type'               => 'full_access',
+                'systeme_activo'            => true,
+                'programa_id'               => $prog->id,
+                'persona_id'                => null,
+                'vinculacion_estado'        => InscripcionSysteme::VINCULACION_PENDIENTE,
+                'vinculacion_motivo_codigo' => InscripcionSysteme::MOTIVO_PERSONA_NO_ENCONTRADA,
+                'primera_sincronizacion_en' => $ahora,
+                'sincronizado_en'           => $ahora,
+            ]);
+        }
+
+        // Contactos sin nombre: la importación los deja pendientes sin crear personas.
+        Http::fake(['https://api.systeme.io/api/contacts/*' => Http::response(['email' => 'x@ejemplo.cl', 'fields' => []], 200)]);
+
+        $admin = User::factory()->create(['is_active' => true, 'email' => 'admin@neuromanagement.cl']);
+        $this->asignarRol($admin, UsuarioRol::ROL_ADMINISTRADOR);
+
+        $cursoDelBoton = function (string $html): ?string {
+            preg_match('#<form[^>]*id="import-alumnos-form".*?</form>#s', $html, $form);
+            preg_match('#name="curso"[^>]*value="([^"]*)"#', $form[0] ?? '', $valor);
+
+            return $valor[1] ?? null;
+        };
+
+        // 1. «Todos los cursos»: no hay selector de curso junto al botón y se envía el curso predeterminado
+        $todos = $this->actingAs($admin)->get('/inscripciones')->assertOk()
+            ->assertSee('pendiente-ec@ejemplo.cl')
+            ->assertSee('pendiente-ce@ejemplo.cl')
+            ->assertDontSee('import-curso-select');
+        $this->assertSame(1, substr_count($todos->getContent(), '<select name="curso"'), 'Solo el filtro de la barra debe tener un selector de curso.');
+        $this->assertSame(InscripcionSyncService::CURSO_DEFAULT_SYSTEME_ID, $cursoDelBoton($todos->getContent()));
+
+        $this->actingAs($admin)->post('/inscripciones/importar-alumnos', ['curso' => $cursoDelBoton($todos->getContent())])
+            ->assertRedirect()
+            ->assertSessionHas('import_result', fn (array $r) => $r['curso_filtro'] === '674252' && $r['inscripciones_evaluadas'] === 1);
+
+        // 2. Filtro por curso 674153: el listado se filtra y el botón envía ese curso
+        $filtrado = $this->actingAs($admin)->get('/inscripciones?curso=674153')->assertOk()
+            ->assertSee('pendiente-ce@ejemplo.cl')
+            ->assertDontSee('pendiente-ec@ejemplo.cl');
+        $this->assertSame('674153', $cursoDelBoton($filtrado->getContent()));
+
+        $this->actingAs($admin)->post('/inscripciones/importar-alumnos', ['curso' => $cursoDelBoton($filtrado->getContent())])
+            ->assertRedirect('/inscripciones?curso=674153')
+            ->assertSessionHas('import_result', fn (array $r) => $r['curso_filtro'] === '674153' && $r['inscripciones_evaluadas'] === 1);
+
+        // 3. «Curso sin sincronizar» también usa el curso predeterminado
+        $sinCurso = $this->actingAs($admin)->get('/inscripciones?curso=sin_curso')->assertOk();
+        $this->assertSame(InscripcionSyncService::CURSO_DEFAULT_SYSTEME_ID, $cursoDelBoton($sinCurso->getContent()));
+    }
+
+    public function test_columna_vinculacion_usa_el_criterio_de_la_bandeja_con_prioridad_de_conflicto(): void
+    {
+        [$evolucion, , $personaExistente] = $this->sembrarDatosBasePrueba();
+        $ahora = Carbon::now();
+
+        $base = [
+            'id_systeme_curso'          => '674252',
+            'access_type'               => 'full_access',
+            'systeme_activo'            => true,
+            'primera_sincronizacion_en' => $ahora,
+            'sincronizado_en'           => $ahora,
+        ];
+
+        // Persona y curso vinculados → «Vinculada»
+        InscripcionSysteme::create($base + [
+            'id_systeme_inscripcion'  => '30000001',
+            'id_systeme_contacto'     => '445697722',
+            'email_contacto'          => 'vinculada@ejemplo.cl',
+            'programa_id'             => $evolucion->id,
+            'persona_id'              => $personaExistente->id,
+            'vinculacion_estado'      => InscripcionSysteme::VINCULACION_VINCULADA,
+            'persona_vinculacion_via' => InscripcionSysteme::VIA_ID_CONTACTO,
+        ]);
+
+        // Persona asociada pero curso sin vincular → sigue «Vinculación pendiente»
+        InscripcionSysteme::create($base + [
+            'id_systeme_inscripcion'    => '30000002',
+            'id_systeme_curso'          => '999999',
+            'id_systeme_contacto'       => '445697722',
+            'email_contacto'            => 'sin-curso@ejemplo.cl',
+            'programa_id'               => null,
+            'persona_id'                => $personaExistente->id,
+            'vinculacion_estado'        => InscripcionSysteme::VINCULACION_PENDIENTE,
+            'persona_vinculacion_via'   => InscripcionSysteme::VIA_ID_CONTACTO,
+            'vinculacion_motivo_codigo' => InscripcionSysteme::MOTIVO_CURSO_NO_SINCRONIZADO,
+            'vinculacion_motivo'        => 'Curso #999999 pendiente de sincronizar en el módulo Programas.',
+        ]);
+
+        // Conflicto de vinculación → «Conflicto de vinculación»
+        InscripcionSysteme::create($base + [
+            'id_systeme_inscripcion'    => '30000003',
+            'id_systeme_contacto'       => '500000003',
+            'email_contacto'            => 'conflicto@ejemplo.cl',
+            'programa_id'               => $evolucion->id,
+            'persona_id'                => null,
+            'vinculacion_estado'        => InscripcionSysteme::VINCULACION_CONFLICTO,
+            'vinculacion_motivo_codigo' => InscripcionSysteme::MOTIVO_CORREO_DUPLICADO,
+            'vinculacion_motivo'        => 'Conflicto de vinculación: hay varias personas con el correo conflicto@ejemplo.cl; revisar vinculación.',
+        ]);
+
+        $admin = User::factory()->create(['is_active' => true, 'email' => 'admin@neuromanagement.cl']);
+        $this->asignarRol($admin, UsuarioRol::ROL_ADMINISTRADOR);
+
+        $html = $this->actingAs($admin)->get('/inscripciones')->assertOk()->getContent();
+
+        $this->assertEstadoVinculacionFila($html, 'vinculada@ejemplo.cl', 'Vinculada');
+        $sinCurso = $this->assertEstadoVinculacionFila($html, 'sin-curso@ejemplo.cl', 'Vinculación pendiente');
+        $conflicto = $this->assertEstadoVinculacionFila($html, 'conflicto@ejemplo.cl', 'Conflicto de vinculación');
+
+        // La celda solo muestra la etiqueta: sin IDs, nombres, métodos ni mensajes de diagnóstico.
+        foreach ([$sinCurso, $conflicto] as $fila) {
+            $this->assertStringNotContainsString('Alumno Registrado', $fila);
+            $this->assertStringNotContainsString('Por ID de contacto', $fila);
+            $this->assertStringNotContainsString('pendiente de sincronizar', $fila);
+            $this->assertStringNotContainsString('revisar vinculación', $fila);
+            $this->assertStringNotContainsString('#30000', $fila);
+        }
     }
 }
 

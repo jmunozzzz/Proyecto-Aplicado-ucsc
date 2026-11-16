@@ -12,77 +12,82 @@
 
 @section('styles')
 <style>
+    /* ── Tarjetas KPI ── */
     .stat-card {
-        background: linear-gradient(135deg, #111a2e, #0f172a);
-        border: 1px solid rgba(51,65,85,.65);
-        border-radius: 1rem;
-        padding: 1.15rem 1.25rem;
-        transition: border-color .2s, box-shadow .2s;
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: .75rem;
+        padding: 1rem 1.125rem;
     }
-    .stat-card:hover { border-color: rgba(6,182,212,.4); box-shadow: 0 0 24px rgba(6,182,212,.08); }
 
+    /* ── Campos de búsqueda y filtros ── */
     .nm-input-dark {
         width: 100%;
-        background: #0b1324;
-        border: 1px solid rgba(71,85,105,.7);
-        border-radius: .6rem;
+        height: 2.5rem;
+        background: #0b1222;
+        border: 1px solid #334155;
+        border-radius: .5rem;
         color: #e2e8f0;
-        padding: .6rem .9rem;
+        padding: 0 .85rem;
         font-size: .875rem;
         font-family: 'Inter', sans-serif;
-        transition: border-color .2s, box-shadow .2s;
+        transition: border-color .15s;
     }
     .nm-input-dark::placeholder { color: #64748b; }
-    .nm-input-dark:hover { border-color: rgba(100,116,139,.9); }
-    .nm-input-dark:focus { outline: none; border-color: #06b6d4; box-shadow: 0 0 0 3px rgba(6,182,212,.18); }
+    .nm-input-dark:hover { border-color: #475569; }
+    .nm-input-dark:focus { outline: none; border-color: #06b6d4; }
     select.nm-input-dark {
         appearance: none; padding-right: 2.25rem; cursor: pointer;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
         background-repeat: no-repeat; background-position: right .7rem center; background-size: 1rem;
     }
 
+    /* ── Tabla ── */
     .nm-table { width: 100%; min-width: 720px; border-collapse: collapse; }
-    .nm-table thead tr { background: rgba(30,41,59,.55); border-bottom: 1px solid rgba(51,65,85,.8); }
+    .nm-table thead tr { border-bottom: 1px solid #1e293b; }
     .nm-table th {
-        padding: .85rem 1rem; text-align: left;
-        font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+        padding: .75rem 1rem; text-align: left;
+        font-size: .75rem; font-weight: 500;
         color: #94a3b8; white-space: nowrap;
     }
     .nm-table th a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; border-radius: .25rem; }
-    .nm-table th a:hover { color: #22d3ee; }
-    .nm-table tbody tr { border-bottom: 1px solid rgba(30,41,59,.9); transition: background .15s; }
+    .nm-table th a:hover { color: #fff; }
+    .nm-table tbody tr { border-bottom: 1px solid #172033; transition: background .15s; }
     .nm-table tbody tr:last-child { border-bottom: none; }
-    .nm-table tbody tr:hover { background: rgba(6,182,212,.045); }
-    .nm-table td { padding: .85rem 1rem; font-size: .875rem; vertical-align: middle; }
+    .nm-table tbody tr:hover { background: #111b2e; }
+    .nm-table td { padding: .9rem 1rem; font-size: .875rem; vertical-align: middle; color: #cbd5e1; }
 
     .course-thumb {
-        width: 44px; height: 44px; border-radius: .65rem;
+        width: 36px; height: 36px; border-radius: .5rem;
         display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
-        font-size: .8rem; font-weight: 700; color: white; overflow: hidden;
-        background: linear-gradient(135deg, #0e7490, #06b6d4);
-        border: 1px solid rgba(6,182,212,.3);
+        font-size: .75rem; font-weight: 600; color: #cbd5e1; overflow: hidden;
+        background: #1e293b;
     }
 
+    /* ── Etiquetas de estado: punto de color + texto ── */
     .badge {
-        display: inline-flex; align-items: center; gap: .3rem;
-        padding: .2rem .65rem; border-radius: 9999px;
-        font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+        display: inline-flex; align-items: center; gap: .4rem;
+        font-size: .8125rem; font-weight: 500; white-space: nowrap; color: #cbd5e1;
     }
-    .badge-activo    { background: rgba(16,185,129,.15); color: #34d399; border: 1px solid rgba(52,211,153,.3); }
-    .badge-pendiente { background: rgba(245,158,11,.13); color: #fbbf24; border: 1px solid rgba(251,191,36,.28); }
-    .badge-inactivo  { background: rgba(100,116,139,.15); color: #cbd5e1; border: 1px solid rgba(148,163,184,.28); }
-    .badge-error     { background: rgba(239,68,68,.14);  color: #fca5a5; border: 1px solid rgba(248,113,113,.3); }
-    .badge-default   { background: rgba(6,182,212,.12);  color: #67e8f9; border: 1px solid rgba(103,232,249,.28); }
+    .badge::before { content: ''; width: .45rem; height: .45rem; border-radius: 9999px; background: currentColor; flex-shrink: 0; }
+    .badge-activo    { color: #34d399; }
+    .badge-pendiente { color: #fbbf24; }
+    .badge-inactivo  { color: #94a3b8; }
+    .badge-error     { color: #fca5a5; }
+    .badge-default   { color: #67e8f9; }
+    /* Etiquetas sin punto para datos de la ficha local */
+    .tag { display: inline-flex; align-items: center; font-size: .75rem; color: #cbd5e1; padding: .1rem .45rem; border-radius: .375rem; background: #1e293b; white-space: nowrap; }
 
+    /* ── Paginación ── */
     .pg-btn {
         display: inline-flex; align-items: center; justify-content: center;
-        min-width: 2.1rem; height: 2.1rem; padding: 0 .5rem;
-        border-radius: .5rem; font-size: .8rem; font-weight: 500;
-        border: 1px solid rgba(71,85,105,.6); color: #cbd5e1; background: #0b1324;
-        text-decoration: none; transition: all .15s;
+        min-width: 2rem; height: 2rem; padding: 0 .5rem;
+        border-radius: .375rem; font-size: .8rem; font-weight: 500;
+        border: 1px solid #334155; color: #cbd5e1; background: transparent;
+        text-decoration: none; transition: background .15s, color .15s;
     }
-    .pg-btn:hover  { background: rgba(6,182,212,.12); color: #22d3ee; border-color: #06b6d4; }
-    .pg-btn.active { background: linear-gradient(135deg,#06b6d4,#0891b2); color: white; border-color: transparent; }
+    .pg-btn:hover  { background: #1e293b; color: #fff; }
+    .pg-btn.active { background: #0891b2; color: #fff; border-color: #0891b2; }
     .pg-btn.disabled { opacity: .35; pointer-events: none; }
 
     .sort-asc::after  { content: ' ↑'; }
@@ -97,20 +102,15 @@
 <div class="space-y-6">
 
     {{-- ── Encabezado y botón de sincronización ── --}}
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div>
-            <h2 class="text-2xl lg:text-3xl font-bold font-jakarta text-white">
-                Programas <span class="text-gradient-cyan">/ Cursos</span>
-            </h2>
-            <p class="text-slate-400 text-sm mt-1">
-                Catálogo sincronizado desde Systeme.io (solo lectura remota) y ficha académica local de NeuroManagement.
-            </p>
-            <p class="text-xs text-slate-500 mt-1">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="min-w-0">
+            <h1 class="text-2xl font-semibold font-jakarta text-white tracking-tight">Programas / Cursos</h1>
+            <p class="text-sm text-slate-400 mt-1">
                 Última sincronización:
                 @if ($ultimaSincronizacion)
-                    <span class="text-slate-300 font-medium">{{ \Carbon\Carbon::parse($ultimaSincronizacion)->format('d/m/Y H:i') }}</span>
+                    <span class="text-slate-200">{{ \Carbon\Carbon::parse($ultimaSincronizacion)->format('d/m/Y H:i') }}</span>
                 @else
-                    <span class="text-amber-300/90">Aún no se ha ejecutado ninguna sincronización</span>
+                    <span class="text-amber-300">aún no se ha ejecutado</span>
                 @endif
             </p>
         </div>
@@ -119,9 +119,9 @@
             <form method="POST" action="{{ route('programas.sync') }}" id="sync-form" class="shrink-0">
                 @csrf
                 <button type="submit" id="sync-button"
-                        class="admin-focus w-full sm:w-auto inline-flex items-center justify-center gap-2.5
-                               bg-gradient-to-r from-nm-cyan to-nm-cyan2 text-white text-sm font-semibold
-                               px-4 py-2.5 rounded-xl shadow-lg shadow-cyan-500/20 hover:brightness-110 transition">
+                        class="admin-focus w-full sm:w-auto inline-flex items-center justify-center gap-2
+                               bg-nm-cyan2 hover:bg-nm-cyan text-white text-sm font-semibold
+                               h-10 px-4 rounded-lg transition-colors">
                     <x-icon name="arrow-path" class="w-4 h-4" />
                     <span id="sync-button-label">Sincronizar desde Systeme.io</span>
                 </button>
@@ -206,41 +206,41 @@
     {{-- ── Totales ── --}}
     @php
         $statItems = [
-            ['label' => 'Total cursos',             'value' => $totales['total'],                  'icon' => 'academic-cap',         'color' => 'text-cyan-300',    'bg' => 'bg-nm-cyan/10 border-nm-cyan/25'],
-            ['label' => 'Activos en Systeme.io',    'value' => $totales['activos_systeme'],        'icon' => 'check-circle',         'color' => 'text-emerald-300', 'bg' => 'bg-emerald-500/10 border-emerald-400/25'],
-            ['label' => 'Inactivos en Systeme.io',  'value' => $totales['inactivos_systeme'],      'icon' => 'pause-circle',         'color' => 'text-slate-300',   'bg' => 'bg-slate-500/10 border-slate-400/25'],
-            ['label' => 'Estructuras pendientes',   'value' => $totales['estructuras_pendientes'], 'icon' => 'exclamation-triangle', 'color' => 'text-amber-300',   'bg' => 'bg-amber-500/10 border-amber-400/25'],
+            ['label' => 'Total cursos',             'value' => $totales['total'],                  'icon' => 'academic-cap',         'color' => 'text-cyan-300'],
+            ['label' => 'Activos en Systeme.io',    'value' => $totales['activos_systeme'],        'icon' => 'check-circle',         'color' => 'text-emerald-300'],
+            ['label' => 'Inactivos en Systeme.io',  'value' => $totales['inactivos_systeme'],      'icon' => 'pause-circle',         'color' => 'text-slate-400'],
+            ['label' => 'Estructuras pendientes',   'value' => $totales['estructuras_pendientes'], 'icon' => 'exclamation-triangle', 'color' => 'text-amber-300'],
         ];
     @endphp
-    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
         @foreach ($statItems as $s)
-            <div class="stat-card flex items-center gap-4">
-                <span class="w-11 h-11 shrink-0 rounded-xl border flex items-center justify-center {{ $s['bg'] }} {{ $s['color'] }}">
-                    <x-icon :name="$s['icon']" class="w-6 h-6" />
-                </span>
-                <div class="min-w-0">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider truncate">{{ $s['label'] }}</p>
-                    <p class="text-2xl sm:text-3xl font-bold font-jakarta text-white leading-tight">{{ number_format($s['value']) }}</p>
+            <div class="stat-card">
+                <div class="flex items-start gap-2 min-w-0">
+                    <x-icon :name="$s['icon']" class="w-4 h-4 mt-0.5 shrink-0 {{ $s['color'] }}" />
+                    <p class="text-sm text-slate-400 leading-snug">{{ $s['label'] }}</p>
                 </div>
+                <p class="mt-2 font-jakarta text-2xl font-semibold text-white tabular-nums leading-none">
+                    {{ number_format($s['value']) }}<span class="text-lg font-medium text-slate-400"> / {{ number_format($totales['total']) }}</span>
+                </p>
             </div>
         @endforeach
     </div>
 
     {{-- ── Búsqueda y filtros ── --}}
-    <form method="GET" action="{{ route('programas.index') }}" id="filter-form" class="panel p-4 lg:p-5" role="search">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+    <form method="GET" action="{{ route('programas.index') }}" id="filter-form" role="search">
+        <div class="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-2.5">
 
-            <div class="sm:col-span-2 lg:col-span-3">
-                <label for="search-input" class="block text-xs font-medium text-slate-400 mb-1.5">Buscar por nombre</label>
+            <div class="sm:basis-full lg:basis-auto lg:flex-1 min-w-0">
+                <label for="search-input" class="sr-only">Buscar por nombre, instructor o categoría</label>
                 <div class="relative">
                     <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <input id="search-input" type="search" name="q" value="{{ request('q') }}"
-                           placeholder="Nombre del curso, instructor o categoría…" class="nm-input-dark !pl-9" autocomplete="off">
+                           placeholder="Buscar curso, instructor o categoría…" class="nm-input-dark !pl-9" autocomplete="off">
                 </div>
             </div>
 
-            <div>
-                <label for="filter-estado" class="block text-xs font-medium text-slate-400 mb-1.5">Estado en Systeme.io</label>
+            <div class="sm:flex-1 lg:flex-none lg:w-56">
+                <label for="filter-estado" class="sr-only">Estado en Systeme.io</label>
                 <select name="estado" id="filter-estado" class="nm-input-dark"
                         onchange="document.getElementById('filter-form').submit()">
                     <option value="">Todos los estados</option>
@@ -251,8 +251,8 @@
                 </select>
             </div>
 
-            <div>
-                <label for="filter-linea" class="block text-xs font-medium text-slate-400 mb-1.5">Tipo de programa</label>
+            <div class="sm:flex-1 lg:flex-none lg:w-48">
+                <label for="filter-linea" class="sr-only">Tipo de programa</label>
                 <select name="linea" id="filter-linea" class="nm-input-dark"
                         onchange="document.getElementById('filter-form').submit()">
                     <option value="">Todos los tipos</option>
@@ -263,17 +263,16 @@
                 </select>
             </div>
 
-            <div class="flex gap-2">
+            <div class="flex gap-2 shrink-0">
                 <button type="submit" id="filter-submit"
-                        class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-nm-cyan to-nm-cyan2 text-white text-sm font-semibold
-                               px-4 py-2.5 rounded-lg hover:brightness-110 transition">
-                    <x-icon name="search" class="w-4 h-4" />
+                        class="admin-focus flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg
+                               border border-slate-700 text-slate-200 text-sm font-medium hover:bg-slate-800 transition-colors">
                     Filtrar
                 </button>
                 @if (request()->hasAny(['q', 'estado', 'linea']))
                     <a href="{{ route('programas.index') }}" id="filter-clear"
-                       class="inline-flex items-center justify-center px-3 rounded-lg border border-slate-600 text-slate-300
-                              hover:border-nm-cyan hover:text-nm-cyan transition-colors"
+                       class="admin-focus inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-700 text-slate-400
+                              hover:bg-slate-800 hover:text-white transition-colors"
                        title="Limpiar filtros" aria-label="Limpiar filtros">
                         <x-icon name="x-mark" class="w-4 h-4" />
                     </a>
@@ -313,12 +312,12 @@
                 <table class="nm-table" aria-label="Listado de programas y cursos">
                     <thead>
                         <tr>
-                            <th scope="col">@include('programas._sort_th', ['col' => 'nombre', 'label' => 'Curso / Programa'])</th>
-                            <th scope="col">@include('programas._sort_th', ['col' => 'systeme_activo', 'label' => 'Estado en Systeme.io'])</th>
-                            <th scope="col" class="hidden md:table-cell">Estructura (Módulos / Lecciones)</th>
+                            <th scope="col">@include('programas._sort_th', ['col' => 'nombre', 'label' => 'Curso'])</th>
+                            <th scope="col">@include('programas._sort_th', ['col' => 'systeme_activo', 'label' => 'Estado'])</th>
+                            <th scope="col" class="hidden md:table-cell">Estructura</th>
                             <th scope="col" class="hidden lg:table-cell">@include('programas._sort_th', ['col' => 'linea', 'label' => 'Ficha local'])</th>
                             <th scope="col" class="hidden xl:table-cell">@include('programas._sort_th', ['col' => 'sincronizado_en', 'label' => 'Última sincronización'])</th>
-                            <th scope="col" class="text-right">Acción</th>
+                            <th scope="col" class="text-right"><span class="sr-only">Acción</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -340,14 +339,18 @@
                                                 {{ $initials }}
                                             @endif
                                         </div>
-                                        <div class="min-w-0">
-                                            <p class="font-semibold text-white truncate">{{ $programa->nombre }}</p>
-                                            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-400">
+                                        <div class="min-w-[12rem] max-w-[24rem]">
+                                            <a href="{{ route('programas.show', $programa) }}"
+                                               class="admin-focus block rounded text-[0.9375rem] font-semibold leading-snug text-white hover:text-cyan-200">{{ $programa->nombre }}</a>
+                                            <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-slate-400 mt-0.5">
                                                 @if ($programa->instructor)
                                                     <span>{{ $programa->instructor }}</span>
                                                 @endif
+                                                @if ($programa->instructor && $programa->id_systeme_curso)
+                                                    <span aria-hidden="true">·</span>
+                                                @endif
                                                 @if ($programa->id_systeme_curso)
-                                                    <span class="text-slate-500">· ID Systeme #{{ $programa->id_systeme_curso }}</span>
+                                                    <span class="tabular-nums">#{{ $programa->id_systeme_curso }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -370,54 +373,47 @@
 
                                 <td class="hidden md:table-cell">
                                     @if ($esPendientePag)
-                                        <span class="badge badge-pendiente">
-                                            <x-icon name="exclamation-triangle" class="w-3.5 h-3.5" />
-                                            Estructura pendiente: requiere paginación
-                                        </span>
+                                        <span class="badge badge-pendiente">Estructura pendiente: requiere paginación</span>
                                         @if ($estructuraConfirmada)
-                                            <p class="text-xs text-slate-400 mt-1">
-                                                Última estructura válida conservada: {{ $programa->modulos_count }} módulos · {{ $programa->lecciones_count }} lecciones
+                                            <p class="text-xs text-slate-400 mt-1 tabular-nums">
+                                                Se conserva la última válida: {{ $programa->modulos_count }} módulos · {{ $programa->lecciones_count }} lecciones
                                             </p>
                                         @else
-                                            <p class="text-xs text-amber-300/80 mt-1">Sin conteo definitivo confirmado</p>
+                                            <p class="text-xs text-slate-400 mt-1">Sin conteo definitivo confirmado</p>
                                         @endif
                                     @elseif ($esErrorEst)
-                                        <span class="badge badge-error">
-                                            <x-icon name="exclamation-triangle" class="w-3.5 h-3.5" />
-                                            Error al actualizar estructura
-                                        </span>
+                                        <span class="badge badge-error">Error al actualizar estructura</span>
                                         @if ($estructuraConfirmada)
-                                            <p class="text-xs text-slate-400 mt-1">
-                                                Última estructura válida conservada: {{ $programa->modulos_count }} módulos · {{ $programa->lecciones_count }} lecciones
+                                            <p class="text-xs text-slate-400 mt-1 tabular-nums">
+                                                Se conserva la última válida: {{ $programa->modulos_count }} módulos · {{ $programa->lecciones_count }} lecciones
                                             </p>
                                         @else
-                                            <p class="text-xs text-rose-300/80 mt-1">Sin estructura confirmada</p>
+                                            <p class="text-xs text-slate-400 mt-1">Sin estructura confirmada</p>
                                         @endif
                                     @elseif ($estructuraConfirmada)
-                                        <p class="text-sm font-medium text-slate-200">
+                                        <span class="text-slate-200 tabular-nums">
                                             {{ $programa->modulos_count }} {{ $programa->modulos_count === 1 ? 'módulo' : 'módulos' }}
                                             ·
                                             {{ $programa->lecciones_count }} {{ $programa->lecciones_count === 1 ? 'lección' : 'lecciones' }}
-                                        </p>
-                                        <p class="text-xs text-emerald-400/90">Estructura completa confirmada</p>
+                                        </span>
                                     @else
-                                        <span class="text-xs text-slate-500">Estructura aún no sincronizada</span>
+                                        <span class="text-slate-500">Aún no sincronizada</span>
                                     @endif
                                 </td>
 
                                 <td class="hidden lg:table-cell">
                                     <div class="flex flex-wrap items-center gap-1.5">
                                         @if ($programa->linea)
-                                            <span class="badge badge-default">{{ $programa->lineaLabel() }}</span>
+                                            <span class="tag">{{ $programa->lineaLabel() }}</span>
                                         @endif
                                         @if ($programa->modalidad)
-                                            <span class="badge badge-inactivo">{{ $programa->modalidadLabel() }}</span>
+                                            <span class="tag">{{ $programa->modalidadLabel() }}</span>
                                         @endif
                                         @if ($programa->horas)
-                                            <span class="text-xs text-slate-300">{{ rtrim(rtrim(number_format((float) $programa->horas, 2, '.', ''), '0'), '.') }} h</span>
+                                            <span class="text-xs text-slate-300 tabular-nums">{{ rtrim(rtrim(number_format((float) $programa->horas, 2, '.', ''), '0'), '.') }} h</span>
                                         @endif
                                         @if (! $programa->linea && ! $programa->modalidad && ! $programa->horas && ! $programa->categoria)
-                                            <span class="text-xs text-amber-300/80">Ficha local pendiente</span>
+                                            <span class="text-slate-500">Pendiente</span>
                                         @endif
                                     </div>
                                     @if ($programa->categoria)
@@ -425,21 +421,16 @@
                                     @endif
                                 </td>
 
-                                <td class="hidden xl:table-cell text-xs text-slate-400">
-                                    @if ($programa->sincronizado_en)
-                                        <span class="block text-slate-300">{{ $programa->sincronizado_en->format('d/m/Y H:i') }}</span>
-                                    @else
-                                        <span>—</span>
-                                    @endif
+                                <td class="hidden xl:table-cell text-slate-400 tabular-nums whitespace-nowrap">
+                                    {{ $programa->sincronizado_en ? $programa->sincronizado_en->format('d/m/Y H:i') : '—' }}
                                 </td>
 
-                                <td class="text-right">
+                                <td class="text-right whitespace-nowrap">
                                     <a href="{{ route('programas.show', $programa) }}"
-                                       class="inline-flex items-center gap-1.5 text-xs font-medium text-nm-cyan hover:text-white
-                                              px-3 py-1.5 rounded-lg border border-nm-cyan/35 hover:bg-nm-cyan/15 transition-colors"
+                                       class="admin-focus inline-flex items-center gap-1 rounded text-sm font-medium text-slate-300 hover:text-white transition-colors"
                                        aria-label="Ver detalle de {{ $programa->nombre }}">
-                                        <x-icon name="eye" class="w-4 h-4" />
-                                        Detalle
+                                        Ver detalle
+                                        <x-icon name="chevron-right" class="w-4 h-4" />
                                     </a>
                                 </td>
                             </tr>

@@ -67,38 +67,35 @@
             width: var(--sb-w);
             transform: translateX(-100%);
             transition: transform .28s cubic-bezier(.22,1,.36,1), width .22s ease;
-            background: linear-gradient(180deg, #0d1628 0%, #0a1120 100%);
-            border-right: 1px solid rgba(51,65,85,.6);
+            background: #0b1222;
+            border-right: 1px solid #1e293b;
         }
-        #admin-sidebar.is-open { transform: translateX(0); box-shadow: 24px 0 60px rgba(0,0,0,.55); }
+        #admin-sidebar.is-open { transform: translateX(0); }
         .sb-scroll { scrollbar-width: thin; scrollbar-color: #1e293b transparent; }
         .sb-scroll::-webkit-scrollbar { width: 6px; }
         .sb-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
 
         .sb-link {
             position: relative; display: flex; align-items: center; gap: .75rem;
-            padding: .6rem .75rem; border-radius: .6rem;
+            padding: .55rem .75rem; border-radius: .5rem;
             font-size: .875rem; font-weight: 500; color: #cbd5e1;
             transition: background .15s, color .15s;
         }
-        a.sb-link:hover { background: rgba(30,41,59,.7); color: #fff; }
-        a.sb-link:hover svg { color: #22d3ee; }
-        .sb-link svg { color: #94a3b8; transition: color .15s; }
-        .sb-link.is-active { background: rgba(6,182,212,.12); color: #fff; }
+        .sb-link svg { width: 1.125rem; height: 1.125rem; flex-shrink: 0; color: #64748b; transition: color .15s; }
+        a.sb-link:hover { background: #131d31; color: #fff; }
+        a.sb-link:hover svg { color: #cbd5e1; }
+        .sb-link.is-active { background: rgba(6,182,212,.1); color: #fff; }
         .sb-link.is-active svg { color: #22d3ee; }
         .sb-link.is-active::before {
-            content: ''; position: absolute; left: -.75rem; top: .45rem; bottom: .45rem; width: 3px;
-            border-radius: 0 3px 3px 0; background: #06b6d4; box-shadow: 0 0 12px rgba(6,182,212,.7);
+            content: ''; position: absolute; left: -.75rem; top: .5rem; bottom: .5rem; width: 2px;
+            border-radius: 0 2px 2px 0; background: #06b6d4;
         }
         .sb-link.is-disabled { color: #64748b; cursor: not-allowed; }
-        .sb-link.is-disabled svg { color: #475569; }
-        .sb-badge {
-            margin-left: auto; font-size: .6rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-            padding: .15rem .45rem; border-radius: 9999px; white-space: nowrap;
-            color: #94a3b8; background: rgba(51,65,85,.45); border: 1px solid rgba(71,85,105,.5);
-        }
-        .sb-section-title { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #64748b; padding: 0 .75rem; margin-bottom: .4rem; }
-        .sb-divider { display: none; height: 1px; margin: .25rem .9rem .6rem; background: rgba(51,65,85,.7); }
+        .sb-link.is-disabled svg { color: #334155; }
+        /* "Próximamente": se indica con el tono atenuado, el tooltip y el texto para lectores de pantalla */
+        .sb-badge { display: none; }
+        .sb-section-title { font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #475569; padding: 0 .75rem; margin-bottom: .35rem; }
+        .sb-divider { display: none; height: 1px; margin: .25rem .9rem .6rem; background: #1e293b; }
 
         #admin-overlay { position: fixed; inset: 0; z-index: 45; background: rgba(2,6,23,.7); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .25s; }
         #admin-overlay.is-visible { opacity: 1; pointer-events: auto; }
@@ -129,7 +126,7 @@
             position: fixed; z-index: 60; pointer-events: none; opacity: 0; transform: translateX(-4px);
             transition: opacity .12s, transform .12s;
             padding: .4rem .65rem; border-radius: .45rem; font-size: .78rem; font-weight: 500; white-space: nowrap;
-            color: #f1f5f9; background: #1e293b; border: 1px solid rgba(6,182,212,.35); box-shadow: 0 8px 24px rgba(0,0,0,.45);
+            color: #f1f5f9; background: #1e293b; border: 1px solid #334155;
         }
         #sb-tooltip.is-visible { opacity: 1; transform: translateX(0); }
 
@@ -138,7 +135,7 @@
         #user-menu[hidden] { display: block; opacity: 0; transform: scale(.96); pointer-events: none; visibility: hidden; }
 
         /* Superficies reutilizables del panel */
-        .panel { background: #0f172a; border: 1px solid rgba(51,65,85,.65); border-radius: 1rem; }
+        .panel { background: #0f172a; border: 1px solid #1e293b; border-radius: .75rem; }
 
         @media (prefers-reduced-motion: reduce) {
             #admin-sidebar, #admin-main, #admin-overlay, #sb-tooltip, #user-menu { transition: none !important; }
@@ -158,12 +155,12 @@
 <aside id="admin-sidebar" class="flex flex-col" aria-label="Menú de administración">
 
     {{-- Marca --}}
-    <div class="sb-brand flex items-center gap-3 h-16 px-5 border-b border-slate-800/80 shrink-0">
+    <div class="sb-brand flex items-center gap-3 h-16 px-5 border-b border-slate-800 shrink-0">
         <a href="{{ route('dashboard') }}" class="admin-focus flex items-center gap-3 min-w-0 rounded-lg" aria-label="NeuroManagement — Inicio del panel" data-tip="NeuroManagement">
-            <span class="w-10 h-10 shrink-0 bg-nm-cyan rounded-xl flex items-center justify-center font-bold text-white text-sm font-jakarta shadow-lg shadow-cyan-500/30">NM</span>
+            <span class="w-9 h-9 shrink-0 bg-nm-cyan rounded-lg flex items-center justify-center font-bold text-white text-sm font-jakarta">NM</span>
             <span class="sb-brand-text leading-tight min-w-0">
                 <span class="block text-white font-jakarta font-bold text-[15px] tracking-tight truncate">NeuroManagement</span>
-                <span class="block text-nm-cyan text-[11px] font-semibold tracking-widest uppercase">Administración</span>
+                <span class="block text-slate-500 text-xs font-medium">Administración</span>
             </span>
         </a>
         <button type="button" id="sidebar-close"
@@ -174,7 +171,7 @@
     </div>
 
     {{-- Navegación (con scroll propio) --}}
-    <nav class="sb-scroll flex-1 overflow-y-auto overflow-x-hidden px-3 py-5 space-y-6" aria-label="Módulos">
+    <nav class="sb-scroll flex-1 overflow-y-auto overflow-x-hidden px-3 py-5 space-y-5" aria-label="Módulos">
         @foreach ($navSections as $section)
             <div>
                 <p class="sb-section-title">{{ $section['title'] }}</p>
@@ -191,7 +188,7 @@
                                     <span class="sb-label truncate">{{ $item['label'] }}</span>
                                 </a>
                             @else
-                                <span class="sb-link is-disabled" aria-disabled="true" data-tip="{{ $item['label'] }} · Próximamente">
+                                <span class="sb-link is-disabled" aria-disabled="true" title="Próximamente" data-tip="{{ $item['label'] }} · Próximamente">
                                     <x-icon :name="$item['icon']" />
                                     <span class="sb-label truncate">{{ $item['label'] }}</span>
                                     <span class="sb-badge">Próximamente</span>
@@ -206,7 +203,7 @@
     </nav>
 
     {{-- Pie: sitio web + cerrar sesión --}}
-    <div class="shrink-0 border-t border-slate-800/80 p-3 space-y-1">
+    <div class="shrink-0 border-t border-slate-800 p-3 space-y-0.5">
         <a href="{{ route('home') }}" target="_blank" rel="noopener" class="sb-link admin-focus" data-tip="Ver sitio web">
             <x-icon name="globe" />
             <span class="sb-label">Ver sitio web</span>
@@ -217,7 +214,7 @@
             @csrf
             <button type="submit" id="sidebar-logout"
                     class="sb-link admin-focus w-full text-left hover:!bg-red-500/10 hover:!text-red-300 group" data-tip="Cerrar sesión">
-                <x-icon name="logout" class="w-5 h-5 group-hover:!text-red-300" />
+                <x-icon name="logout" class="group-hover:!text-red-300" />
                 <span class="sb-label">Cerrar sesión</span>
             </button>
         </form>
@@ -232,21 +229,29 @@
 
     {{-- Barra superior --}}
     <header class="sticky top-0 z-30 h-16 flex items-center gap-3 px-4 sm:px-6 lg:px-8
-                   bg-[#0a1120] border-b border-slate-800/80">
+                   bg-[#0a1120] border-b border-slate-800">
         <button type="button" id="sidebar-toggle"
                 class="admin-focus p-2 -ml-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors"
                 aria-controls="admin-sidebar" aria-expanded="false" aria-label="Abrir menú">
             <x-icon name="bars" class="w-6 h-6" />
         </button>
 
-        <h1 class="font-jakarta font-semibold text-white text-base sm:text-lg truncate">@yield('page_title', 'Panel')</h1>
+        {{-- Navegación de la pantalla: ruta hacia las páginas superiores. El título principal
+             lo muestra el contenido; si la vista no define ruta, se usa page_title. --}}
+        <div class="min-w-0 flex-1">
+            @hasSection('breadcrumbs')
+                @yield('breadcrumbs')
+            @else
+                <h1 class="text-base sm:text-lg font-semibold text-white truncate">@yield('page_title', 'Panel')</h1>
+            @endif
+        </div>
 
         @if ($authUser)
-            <div class="relative ml-auto">
+            <div class="relative ml-auto shrink-0">
                 <button type="button" id="user-menu-button"
-                        class="admin-focus flex items-center gap-3 rounded-xl pl-1.5 pr-2 py-1.5 hover:bg-slate-800/70 transition-colors"
+                        class="admin-focus flex items-center gap-3 rounded-lg pl-1.5 pr-2 py-1.5 hover:bg-slate-800/70 transition-colors"
                         aria-haspopup="menu" aria-expanded="false" aria-controls="user-menu">
-                    <span class="w-9 h-9 rounded-full bg-gradient-to-br from-nm-cyan3 to-nm-cyan flex items-center justify-center text-white text-xs font-bold">{{ $userInitials }}</span>
+                    <span class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-100 text-xs font-semibold">{{ $userInitials }}</span>
                     <span class="hidden sm:block text-left leading-tight max-w-[180px]">
                         <span class="block text-sm font-semibold text-slate-100 truncate">{{ $authUser->name }}</span>
                         {{-- El sistema aún no asigna roles a las cuentas del panel: no se muestra rol. --}}
@@ -256,7 +261,7 @@
                 </button>
 
                 <div id="user-menu" hidden role="menu" aria-labelledby="user-menu-button"
-                     class="absolute right-0 mt-2 w-64 rounded-xl border border-slate-700/70 bg-[#0f172a] shadow-2xl shadow-black/50 overflow-hidden">
+                     class="absolute right-0 mt-2 w-64 rounded-lg border border-slate-700 bg-[#0f172a] shadow-lg shadow-black/30 overflow-hidden">
                     <div class="px-4 py-3 border-b border-slate-800">
                         <p class="text-sm font-semibold text-white truncate">{{ $authUser->name }}</p>
                         <p class="text-xs text-slate-400 truncate">{{ $authUser->email }}</p>
@@ -276,8 +281,6 @@
     </header>
 
     <main id="admin-content" class="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 lg:py-8 bg-[#0a1120]" tabindex="-1">
-        @yield('breadcrumbs')
-
         @if (session('status'))
             <div class="mb-6 flex items-start gap-3 rounded-xl border border-nm-cyan/30 bg-nm-cyan/10 px-4 py-3 text-sm text-cyan-100" role="status">
                 <x-icon name="info" class="w-5 h-5 text-nm-cyan" />

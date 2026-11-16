@@ -126,9 +126,9 @@
 
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2.5 mb-1.5">
-                        <h2 class="text-xl sm:text-2xl font-bold font-jakarta text-white">
+                        <h1 class="text-xl sm:text-2xl font-bold font-jakarta text-white">
                             {{ $programa->nombre }}
-                        </h2>
+                        </h1>
                         @if ($programa->systeme_presente === false)
                             <span class="badge badge-pendiente">Ausente en último listado de Systeme.io</span>
                         @elseif ($programa->systeme_activo === true)

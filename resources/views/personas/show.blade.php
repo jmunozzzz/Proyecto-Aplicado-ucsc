@@ -117,9 +117,9 @@
                 </div>
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-3 mb-1">
-                        <h2 class="text-xl sm:text-2xl font-bold font-jakarta text-white truncate">
+                        <h1 class="text-xl sm:text-2xl font-bold font-jakarta text-white truncate">
                             {{ $persona->nombres }} {{ $persona->apellidos }}
-                        </h2>
+                        </h1>
                         @php
                             $badgeClass = match($persona->estado) {
                                 'activo'   => 'badge-activo',

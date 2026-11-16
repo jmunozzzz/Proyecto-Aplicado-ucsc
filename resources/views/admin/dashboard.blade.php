@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Inicio')
-@section('page_title', 'Inicio')
+@section('page_title', 'Panel de NeuroManagement')
 
 @section('breadcrumbs')
     <x-admin.breadcrumbs :items="[['label' => 'Inicio']]" />
